@@ -6,6 +6,23 @@ PRET is a new tool for printer security testing developed in the scope of a [Mas
 
 The main idea of PRET is to facilitate the communication between the end-user and the printer. Thus, after entering a UNIX-like command, PRET translates it to PostScript, PJL or PCL, sends it to the printer, evaluates the result and translates it back to a user-friendly format. PRET offers a whole bunch of commands useful for printer attacks and fuzzing.
 
+### Web application and server deployment status
+
+This repository currently contains the PRET command-line application only. It
+does **not** contain a web frontend, web backend/API, login system, or a printer
+management screen for entering printer IP addresses. There is consequently no
+frontend or backend start command for this checkout.
+
+The requested server address (`192.168.8.10`) and ports (`8043` for the
+frontend, `8047` for the backend) are **not configured or used** by the
+application. Starting PRET does not start web services or bind either port.
+Do not treat this checkout as a ready-to-deploy web service.
+
+The root `.env.example` and `migrations/001_initial.up.sql` are configuration
+and schema scaffolding only: PRET does not load the environment file, connect
+to PostgreSQL, or use those tables. The migration must only be applied to a
+PostgreSQL database that you have separately created and configured.
+
 ![PRET design](img/architecture.png)
 
 ### Installation
