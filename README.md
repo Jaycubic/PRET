@@ -6,22 +6,80 @@ PRET is a new tool for printer security testing developed in the scope of a [Mas
 
 The main idea of PRET is to facilitate the communication between the end-user and the printer. Thus, after entering a UNIX-like command, PRET translates it to PostScript, PJL or PCL, sends it to the printer, evaluates the result and translates it back to a user-friendly format. PRET offers a whole bunch of commands useful for printer attacks and fuzzing.
 
-### Web application and server deployment status
+### Inventory API (backend-only initial step)
 
-This repository currently contains the PRET command-line application only. It
-does **not** contain a web frontend, web backend/API, login system, or a printer
-management screen for entering printer IP addresses. There is consequently no
-frontend or backend start command for this checkout.
+An initial, **inventory-only** HTTP API is available in `backend/`. It lets an
+operator manually add and list printer IP addresses in PostgreSQL. It does not
+connect to, scan, probe, or send commands to a printer. The API accepts literal
+IPv4/IPv6 addresses only; hostnames and CIDR ranges are rejected.
 
-The requested server address (`192.168.8.10`) and ports (`8043` for the
-frontend, `8047` for the backend) are **not configured or used** by the
-application. Starting PRET does not start web services or bind either port.
-Do not treat this checkout as a ready-to-deploy web service.
+The API deliberately binds to `127.0.0.1:8047` for this first backend test.
+It is not exposed on `192.168.8.10`, and the frontend on port `8043` has not
+been implemented. Do not configure a reverse proxy or public/LAN bind for this
+unauthenticated initial API.
 
-The root `.env.example` and `migrations/001_initial.up.sql` are configuration
-and schema scaffolding only: PRET does not load the environment file, connect
-to PostgreSQL, or use those tables. The migration must only be applied to a
-PostgreSQL database that you have separately created and configured.
+#### Start and test the backend on the server
+
+These commands use the `pretweb` PostgreSQL database you created. They do not
+create a database or contact a printer.
+
+```bash
+cd /opt/View/PRET
+python3 -m venv .venv
+.venv/bin/python -m pip install -r backend/requirements.txt
+cp .env.example .env
+nano .env
+```
+
+In `.env`, set `DATABASE_URL` to the connection for your existing database.
+Since you connected with `psql -U jofrey` over the local PostgreSQL socket, the
+example uses that same local-socket connection and assumes the backend process
+runs as the Linux user `jofrey`:
+
+```dotenv
+DATABASE_URL=postgresql:///pretweb?user=jofrey
+```
+
+If you instead configure PostgreSQL for TCP/password authentication, use a
+`postgresql://user:password@host:5432/pretweb` URL and percent-encode any
+URL-special characters in the password. Keep `.env` private; it is excluded
+from Git.
+
+Run the closed, local unit tests, then start the API:
+
+```bash
+.venv/bin/python -m unittest backend.test_server
+set -a
+. ./.env
+set +a
+.venv/bin/python -m backend.server
+```
+
+Keep that server process running. In a second SSH shell on the same server,
+check database health:
+
+```bash
+curl -i http://127.0.0.1:8047/healthz
+```
+
+Manually save the supplied printer IP as inventory data (this makes no
+connection to that address):
+
+```bash
+curl -i -X POST http://127.0.0.1:8047/api/devices \
+  -H 'Content-Type: application/json' \
+  -d '{"target_ip":"192.168.2.98"}'
+```
+
+List the saved inventory:
+
+```bash
+curl -i http://127.0.0.1:8047/api/devices
+```
+
+The API has only `GET /healthz`, `GET /api/devices`, and
+`POST /api/devices` in this stage. Adding authentication and a frontend must
+precede exposing it to other hosts. Port `8043` is not active yet.
 
 ![PRET design](img/architecture.png)
 
