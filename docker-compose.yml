@@ -1,0 +1,28 @@
+version: "3.8"
+
+services:
+  pret-web-ui:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: pret-web-ui
+    restart: unless-stopped
+    ports:
+      - "8443:8443"
+    environment:
+      - BIND_HOST=0.0.0.0
+      - BIND_PORT=8443
+      - SECRET_KEY=generate-a-strong-random-key-in-production
+      - DATABASE_URL=sqlite:///./data/pretweb.db
+      - JOB_TIMEOUT_SECONDS=90
+      - MAX_CONCURRENT_JOBS=4
+    volumes:
+      - pret-data:/app/backend/data
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+
+volumes:
+  pret-data:
+    name: pret-web-data

@@ -1,1 +1,15 @@
-psycopg[binary]>=3.2,<4
+fastapi==0.115.0
+uvicorn[standard]==0.30.6
+sqlalchemy==2.0.35
+pydantic==2.9.2
+pydantic-settings==2.5.2
+python-jose[cryptography]==3.3.0
+passlib[bcrypt]==1.7.4
+bcrypt==4.0.1
+python-multipart==0.0.9
+paramiko==3.5.0
+python-dotenv==1.0.1
+zeroconf==0.151.5
+pysnmp==7.1.21
+pyipp==0.17.2
+requests==2.34.2

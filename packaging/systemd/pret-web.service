@@ -1,0 +1,43 @@
+[Unit]
+Description=PRET Web UI — Printer Security Assessment Platform
+Documentation=https://github.com/RUB-NDS/PRET
+After=network.target network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=pretweb
+Group=pretweb
+WorkingDirectory=/opt/pret-web-ui/backend
+Environment="PATH=/opt/pret-web-ui/venv/bin:/usr/local/bin:/usr/bin:/bin"
+ExecStart=/opt/pret-web-ui/venv/bin/uvicorn app.main:app --host 0.0.0.0 --port 8443
+Restart=on-failure
+RestartSec=5s
+
+# Security Hardening Flags (see pret-web-ui-docs/04-DEPLOYMENT-PORTABILITY.md)
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+PrivateTmp=true
+ProtectKernelTunables=true
+ProtectKernelModules=true
+ProtectControlGroups=true
+RestrictAddressFamilies=AF_INET AF_INET6 AF_UNIX
+RestrictNamespaces=true
+RestrictRealtime=true
+RestrictSUIDSGID=true
+LockPersonality=true
+MemoryDenyWriteExecute=false
+CapabilityBoundingSet=CAP_NET_BIND_SERVICE
+AmbientCapabilities=
+
+# Explicit writable directories for SQLite DB and bounded per-job scratch
+ReadWritePaths=/opt/pret-web-ui/backend/data
+
+# Resource Limits
+LimitNOFILE=65535
+LimitNPROC=4096
+TasksMax=512
+
+[Install]
+WantedBy=multi-user.target

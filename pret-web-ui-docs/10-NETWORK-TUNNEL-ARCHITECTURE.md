@@ -23,18 +23,18 @@ from config, not guessed at connection time.
 This is the right default because it requires **zero changes to PRET
 itself** — `conn.open()` already parses `host:port` and connects with a
 plain `socket.connect()`. If the backend forwards a local port to the real
-target over SSH and then hands PRET the string `127.0.0.1:<local_port>`
+target over SSH and then hands PRET the string `0.0.0.0:<local_port>`
 instead of the real target, PRET behaves exactly as it does today; it has
 no idea a tunnel exists.
 
 ```
 Backend (192.168.8.10)                    Pivot host (dual-homed)
    │                                            │
-   │  ssh -L 127.0.0.1:<local_port>:            │
+   │  ssh -L 0.0.0.0:<local_port>:            │
    │       172.16.159.5:9100 pivotuser@pivot ───┼──> 172.16.159.5:9100
    │                                            │
    ▼
-PRET subprocess target = "127.0.0.1:<local_port>"
+PRET subprocess target = "0.0.0.0:<local_port>"
 ```
 
 - Use `paramiko` (pure Python, cross-platform, no system `ssh` binary
@@ -132,7 +132,7 @@ tunnel.
    `is_enabled`, decrypt its credential, open the forward (or confirm an
    existing one for this job can be reused — but still one forward per
    job, not a shared standing tunnel), hand the adapter
-   `127.0.0.1:<local_port>` instead of the real target.
+   `0.0.0.0:<local_port>` instead of the real target.
 5. Record `jobs.route_id` either way, so the audit log always shows
    whether a job went direct or through a named pivot.
 6. Tear down the forward when the job ends (success, failure, timeout, or

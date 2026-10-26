@@ -5,8 +5,8 @@ class fuzzer():
     vol = ["", ".", "\\", "/", "file:///", "C:/", "D:/", "E:/", "F:/"]
     var = ["~", "$HOME"]
     win = ["%WINDIR%", "%SYSTEMROOT%", "%HOMEPATH%", "%PROGRAMFILES%"]
-    smb = ["\\\\127.0.0.1\\"]
-    web = ["http://127.0.0.1/"]  # "http://hacking-printers.net/log.me"
+    smb = ["\\\\0.0.0.0\\"]
+    web = ["http://0.0.0.0/"]  # "http://hacking-printers.net/log.me"
     dir = ["..", "...", "...."]  # also combinations like "./.."
 # sep = ["", "\\", "/", "\\\\", "//", "\\/"]
     fhs = ["/etc", "/bin", "/sbin", "/home", "/proc", "/dev", "/lib",
