@@ -1,0 +1,72 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "FleetIntelligenceReport",
+  "type": "object",
+  "required": [
+    "executive_summary",
+    "fleet_risk_level",
+    "prioritized_remediations",
+    "cve_breakdowns"
+  ],
+  "properties": {
+    "executive_summary": {
+      "type": "string",
+      "description": "High-level summary of findings, exposures, and overall fleet posture."
+    },
+    "fleet_risk_level": {
+      "type": "string",
+      "enum": ["CRITICAL", "HIGH", "MEDIUM", "LOW", "CLEAN"]
+    },
+    "prioritized_remediations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["priority", "target", "action", "verification"],
+        "properties": {
+          "priority": {
+            "type": "integer",
+            "minimum": 1,
+            "maximum": 5,
+            "description": "1 = Immediate / Critical, 5 = Maintenance / Minor"
+          },
+          "target": {
+            "type": "string",
+            "description": "Endpoint address or 'ALL' for fleet-wide policy."
+          },
+          "action": {
+            "type": "string",
+            "description": "Specific, actionable remediation instruction or command."
+          },
+          "prerequisites": {
+            "type": "array",
+            "items": { "type": "string" }
+          },
+          "verification": {
+            "type": "string",
+            "description": "Validation check to confirm the vulnerability has been mitigated."
+          },
+          "rollback": {
+            "type": "string",
+            "description": "Procedure to revert if standard printing workflows are disrupted."
+          }
+        }
+      }
+    },
+    "cve_breakdowns": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["cve_id", "cvss", "exploitability_notes", "affected_endpoints"],
+        "properties": {
+          "cve_id": { "type": "string" },
+          "cvss": { "type": "number" },
+          "exploitability_notes": { "type": "string" },
+          "affected_endpoints": {
+            "type": "array",
+            "items": { "type": "string" }
+          }
+        }
+      }
+    }
+  }
+}

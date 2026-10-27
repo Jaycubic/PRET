@@ -135,6 +135,18 @@ class AuditLog(Base):
     detail: Mapped[str] = mapped_column(Text, default="")
 
 
+class IntelligenceReport(Base):
+    __tablename__ = "intelligence_reports"
+    id: Mapped[int] = mapped_column(primary_key=True)
+    created_at: Mapped[datetime] = mapped_column(DateTime, default=now)
+    created_by_user_id: Mapped[int | None] = mapped_column(ForeignKey("users.id"), nullable=True)
+    model_used: Mapped[str] = mapped_column(String(64), default="offline-kb")
+    fleet_risk_level: Mapped[str] = mapped_column(String(16), default="CLEAN")
+    executive_summary: Mapped[str] = mapped_column(Text, default="")
+    report_markdown: Mapped[str] = mapped_column(Text, default="")
+    structured_json: Mapped[dict] = mapped_column(JSON, default=dict)
+
+
 engine = create_engine(
     settings.database_url,
     connect_args={"check_same_thread": False} if settings.database_url.startswith("sqlite") else {},

@@ -1,3 +1,4 @@
+from datetime import datetime
 from pydantic import BaseModel
 
 
@@ -52,7 +53,19 @@ class JobOut(BaseModel):
     adapter_id: str
     operation_id: str
     status: str
+    is_state_changing: bool = False
+    confirmed: bool = False
+    requested_at: datetime | None = None
+    started_at: datetime | None = None
+    finished_at: datetime | None = None
     model_config = {"from_attributes": True}
+
+
+class JobEvent(BaseModel):
+    stage: str
+    status: str
+    message: str
+    timestamp: str
 
 
 class AuthorizedNetworkCreate(BaseModel):

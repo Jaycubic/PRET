@@ -14,7 +14,7 @@ from fastapi.staticfiles import StaticFiles
 from .config import settings
 from .db import init_db, SessionLocal, User
 from .security import hash_password
-from .routes import auth, devices, jobs, adapters, settings_routes, audit, discovery
+from .routes import auth, devices, jobs, adapters, settings_routes, audit, discovery, intelligence
 from . import ws
 
 app = FastAPI(title="PRET Web UI", version="0.1.0")
@@ -38,6 +38,7 @@ app.include_router(adapters.router)
 app.include_router(settings_routes.router)
 app.include_router(audit.router)
 app.include_router(discovery.router)
+app.include_router(intelligence.router)
 app.include_router(ws.router)
 
 

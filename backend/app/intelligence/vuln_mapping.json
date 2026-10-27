@@ -1,0 +1,103 @@
+{
+  "rules": [
+    {
+      "id": "CUPS-RCE-CHAIN",
+      "cve_id": "CVE-2024-47176",
+      "cwe_id": "CWE-1327",
+      "cvss_score": 9.8,
+      "severity": "CRITICAL",
+      "category": "Remote Code Execution",
+      "title": "CUPS cups-browsed UDP 631 Remote Code Execution Chain",
+      "adapter_id": "cups_server",
+      "condition": {
+        "or": [
+          { "field": "chain_exploitable", "equals": true },
+          { "field": "udp_631_exposed", "equals": true },
+          { "field": "is_vulnerable_version", "equals": true }
+        ]
+      },
+      "description": "cups-browsed binds to UDP INADDR_ANY:631 without authentication and parses untrusted IPP packet headers, triggering foomatic-rip command execution via CVE-2024-47076, CVE-2024-47175, and CVE-2024-47177.",
+      "remediation": "Stop and disable cups-browsed service: 'sudo systemctl stop cups-browsed && sudo systemctl disable cups-browsed'. Alternatively, drop incoming UDP packets to port 631 via iptables/nftables."
+    },
+    {
+      "id": "CUPS-ADMIN-EXPOSURE",
+      "cve_id": "CWE-306",
+      "cwe_id": "CWE-306",
+      "cvss_score": 5.3,
+      "severity": "MEDIUM",
+      "category": "Access Control",
+      "title": "CUPS Web Administration Interface Exposed",
+      "adapter_id": "cups_server",
+      "condition": {
+        "field": "admin_audit.status",
+        "equals": "accessible"
+      },
+      "description": "The CUPS administrative web portal is accessible over HTTP on port 631 without requiring TLS mutual authentication, potentially exposing print server configuration and active job histories.",
+      "remediation": "Enforce 'DefaultEncryption Required' in /etc/cups/cupsd.conf and restrict '<Location /admin>' to authorized administrator CIDRs only."
+    },
+    {
+      "id": "PJL-UNAUTH-RAW",
+      "cve_id": "CWE-287",
+      "cwe_id": "CWE-287",
+      "cvss_score": 7.5,
+      "severity": "HIGH",
+      "category": "Legacy Protocol Exposure",
+      "title": "PJL Raw Port 9100 Unauthenticated Command Access",
+      "adapter_id": "pjl",
+      "condition": {
+        "field": "pjl_accessible",
+        "equals": true
+      },
+      "description": "The target accepts raw TCP connections on port 9100 and processes Printer Job Language (@PJL) commands without authentication, allowing unauthenticated file extraction, environment manipulation, and print job interception.",
+      "remediation": "Isolate printers onto a dedicated, non-routable printer VLAN. Restrict port 9100 access to authorized print servers only, and disable PJL in the printer's embedded web server (EWS) where supported."
+    },
+    {
+      "id": "PS-FILESYSTEM-ACCESS",
+      "cve_id": "CWE-284",
+      "cwe_id": "CWE-284",
+      "cvss_score": 7.1,
+      "severity": "HIGH",
+      "category": "Interpreted Language Exploitation",
+      "title": "PostScript Device Filesystem / Operator Access",
+      "adapter_id": "postscript",
+      "condition": {
+        "field": "ps_filesystem_accessible",
+        "equals": true
+      },
+      "description": "The PostScript interpreter supports unconstrained file operators (%rom%, %ram%, %disk%), enabling read and write access to printer internal storage.",
+      "remediation": "Configure PostScript execution policies to disable direct filesystem operator access, set an administrative PostScript password, or transition to secure IPP-only print rendering."
+    },
+    {
+      "id": "SNMP-DEFAULT-COMMUNITY",
+      "cve_id": "CWE-1188",
+      "cwe_id": "CWE-1188",
+      "cvss_score": 5.3,
+      "severity": "LOW",
+      "category": "Information Disclosure",
+      "title": "SNMP Agent Responds with Default Community String",
+      "adapter_id": "snmp",
+      "condition": {
+        "field": "default_community_valid",
+        "equals": true
+      },
+      "description": "The device responds to SNMP queries using the default 'public' community string, disclosing serial numbers, network configurations, firmware levels, and active queue telemetry.",
+      "remediation": "Disable SNMPv1/v2c on the device. Transition to SNMPv3 with SHA authentication and AES encryption, or assign an unpredictable, complex community string."
+    },
+    {
+      "id": "IPP-UNAUTH-ATTRIBUTES",
+      "cve_id": "CWE-200",
+      "cwe_id": "CWE-200",
+      "cvss_score": 4.3,
+      "severity": "LOW",
+      "category": "Information Disclosure",
+      "title": "IPP Get-Printer-Attributes Open Disclosure",
+      "adapter_id": "ipp",
+      "condition": {
+        "field": "ipp_attributes_exposed",
+        "equals": true
+      },
+      "description": "Internet Printing Protocol (IPP) on port 631 answers Get-Printer-Attributes without credentials, disclosing internal hostname, exact firmware build, and supported PDLs.",
+      "remediation": "Require TLS 1.3 for all IPP connections (IPPS on port 443) and enable user authentication for printer attribute queries."
+    }
+  ]
+}

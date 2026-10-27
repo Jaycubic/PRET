@@ -44,6 +44,19 @@ def get_device_results(device_id: int, db: Session = Depends(get_db), user: User
     )
 
 
+@router.delete("/{device_id}")
+def delete_device(device_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
+    device = db.get(Device, device_id)
+    if not device:
+        raise HTTPException(status_code=404, detail="Device not found")
+    target_info = f"{device.ip_or_hostname}:{device.port}"
+    db.delete(device)
+    db.add(AuditLog(user_id=user.id, action="delete_device", target_device_id=device_id,
+                     outcome="success", detail=f"Deleted device {target_info}"))
+    db.commit()
+    return {"status": "ok", "message": f"Device {target_info} removed"}
+
+
 @router.post("/{device_id}/probe")
 def probe_existing_device(device_id: int, db: Session = Depends(get_db), user: User = Depends(get_current_user)):
     device = db.get(Device, device_id)

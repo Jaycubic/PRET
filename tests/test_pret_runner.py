@@ -73,7 +73,7 @@ def test_pret_runner_hang_timeout():
     # Mock server that accepts connection and never replies
     sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
     sock.setsockopt(socket.SOL_SOCKET, socket.SO_REUSEADDR, 1)
-    sock.bind(("0.0.0.0", 0))
+    sock.bind(("127.0.0.1", 0))
     sock.listen(1)
     port = sock.getsockname()[1]
 
@@ -104,7 +104,7 @@ def test_pret_runner_hang_timeout():
         t0 = time.time()
         returncode, raw_output, error = run_pret_session(
             mode="pjl",
-            resolved_ip="0.0.0.0",
+            resolved_ip="127.0.0.1",
             port=port,
             command_text="id\n",
         )
